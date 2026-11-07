@@ -2,14 +2,74 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>قطعتك | قطع غيار السيارات</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>قطعتك | سوق قطع غيار السيارات</title>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#17212b}header{background:#102c43;color:white;padding:25px;text-align:center}h1{margin:0 0 10px}.container{padding:20px;max-width:650px;margin:auto}input,button{box-sizing:border-box;width:100%;padding:15px;margin:8px 0;border-radius:10px;font-size:16px}input{border:1px solid #ccc}button{background:#ed8b2c;color:white;border:0;cursor:pointer}.card{background:white;padding:20px;border-radius:15px;margin:15px 0;box-shadow:0 2px 8px #0001}</style>
-</style> </head>
+*{box-sizing:border-box}body{margin:0;background:#f1f5f6;color:#101820;font-family:Arial,sans-serif}
+header{background:#080d12;color:white;padding:22px 16px;text-align:center;border-bottom:5px solid #12c9c2}
+header h1{color:#23d7d0;font-size:34px;margin:0}header p{margin:10px 0}
+nav{display:flex;justify-content:space-around;background:#101820;padding:14px 5px;position:sticky;top:0;z-index:2}
+nav a{color:white;text-decoration:none;font-size:14px}
+main{max-width:750px;margin:auto;padding:16px}
+.panel,.ad{background:white;padding:18px;border-radius:16px;margin-bottom:15px;box-shadow:0 3px 12px #00000012}
+h2{font-size:22px}input,select,textarea{width:100%;padding:14px;margin:7px 0;border:1px solid #ccd5d7;border-radius:10px;font:inherit}
+button,.btn{display:inline-block;background:#08aaa6;color:white;border:0;border-radius:10px;padding:13px 17px;font:inherit;cursor:pointer;text-decoration:none}
+.primary{width:100%;background:#08aaa6;font-weight:bold}
+.ad{border-right:5px solid #10c6be}.ad h3{margin:5px 0}.price{color:#008e88;font-size:21px;font-weight:bold}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.actions button{flex:1;min-width:85px;font-size:13px;padding:11px 6px}
+.muted{color:#657278;font-size:14px}
+#chatbox{display:none;position:fixed;inset:10% 5%;background:white;z-index:5;padding:18px;border-radius:15px;box-shadow:0 0 0 100vmax #0009;overflow:auto}
+#messages{height:45%;overflow:auto;background:#f1f5f6;padding:12px;border-radius:10px}
+.message{background:#d9faf8;margin:8px 0;padding:10px;border-radius:10px}
+footer{text-align:center;background:#101820;color:white;padding:25px;margin-top:20px}
+</style>
+</head>
 <body>
-<header><h1>🚗 قطعتك</h1><p>سوق قطع غيار السيارات</p></header>
-<main class="container"><h2>ابحث عن قطعتك</h2><input id="search" placeholder="مثال: صدام كامري 2020"><button onclick="searchParts()">بحث عن قطعة</button><p id="result"></p><div class="card"><h3>🔧 قطع غيار</h3><p>اعثر على القطعة المناسبة لسيارتك.</p></div><div class="card"><h3>🏪 محلات قطع الغيار</h3><p>قريبًا: عرض المحلات والقطع المتوفرة.</p></div></main>
-<script>function searchParts(){let q=document.getElementById("search").value.trim();document.getElementById("result").textContent=q?"بحثت عن: "+q+" — سيتم إضافة نتائج القطع لاحقًا.":"اكتب اسم القطعة أولًا";}</script>
+<header><h1>🚗 قطعتك</h1><p>سوق بيع وشراء قطع غيار السيارات في السعودية</p></header>
+<nav><a href="#home">الرئيسية</a><a href="#ads">الإعلانات</a><a href="#sell">أضف إعلان</a></nav>
+<main id="home">
+<section class="panel"><h2>🔎 ابحث عن قطعتك</h2>
+<input id="search" placeholder="مثال: صدام كامري 2020" oninput="render()">
+<select id="region" onchange="render()"><option value="">جميع مناطق السعودية</option><option>الرياض</option><option>مكة المكرمة</option><option>المدينة المنورة</option><option>المنطقة الشرقية</option><option>القصيم</option><option>عسير</option><option>تبوك</option><option>حائل</option><option>جازان</option><option>نجران</option><option>الباحة</option><option>الجوف</option><option>الحدود الشمالية</option></select>
+</section>
+<section id="ads"><h2>🛞 إعلانات قطع الغيار</h2><div id="list"></div></section>
+<section id="sell" class="panel"><h2>➕ أضف إعلانك مجانًا</h2>
+<input id="title" placeholder="اسم القطعة والسيارة" maxlength="100">
+<input id="price" type="number" min="1" placeholder="السعر بالريال">
+<select id="city"><option value="">اختر المنطقة</option><option>الرياض</option><option>مكة المكرمة</option><option>المدينة المنورة</option><option>المنطقة الشرقية</option><option>القصيم</option><option>عسير</option><option>تبوك</option><option>حائل</option><option>جازان</option><option>نجران</option><option>الباحة</option><option>الجوف</option><option>الحدود الشمالية</option></select>
+<textarea id="description" placeholder="وصف القطعة وحالتها"></textarea>
+<input id="phone" type="tel" placeholder="رقم الجوال السعودي 05xxxxxxxx" maxlength="10">
+<button class="primary" onclick="addAd()">نشر الإعلان مجانًا</button>
+<p class="muted">نسخة تجريبية: الإعلانات تحفظ على هذا الجهاز فقط.</p>
+</section>
+</main>
+<div id="chatbox"><button onclick="closeChat()">إغلاق ✕</button><h2 id="chatTitle">محادثة</h2><p class="muted">محادثة تجريبية محفوظة على هذا الجهاز فقط.</p><div id="messages"></div><input id="msg" placeholder="اكتب عرضك أو رسالتك"><button class="primary" onclick="sendMsg()">إرسال</button></div>
+<footer>قطعتك © 2026 — إعلانات مجانية في البداية</footer>
+<script>
+const key="qatatak_ads_v1";
+let ads=JSON.parse(localStorage.getItem(key)||"[]"),active=0;
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){
+const q=document.getElementById("search").value.trim().toLowerCase(),r=document.getElementById("region").value;
+const found=ads.map((a,i)=>({...a,id:i})).filter(a=>(a.title+" "+a.description).toLowerCase().includes(q)&&(!r||a.city===r));
+document.getElementById("list").innerHTML=found.length?found.map(a=>'<article class="ad"><h3>'+safe(a.title)+'</h3><p class="price">'+safe(a.price)+' ريال</p><p>📍 '+safe(a.city)+'</p><p>'+safe(a.description)+'</p><div class="actions"><button onclick="openChat('+a.id+')">💬 تفاوض</button><button onclick="whatsapp('+a.id+')">واتساب</button><button onclick="callSeller('+a.id+')">📞 اتصال</button></div></article>').join(""):'<div class="panel">لا توجد إعلانات حاليًا. كن أول من يضيف قطعة!</div>';
+}
+function addAd(){
+const get=id=>document.getElementById(id).value.trim();
+let title=get("title"),price=get("price"),city=get("city"),description=get("description"),phone=get("phone");
+if(!title||!city||!description||!/^05\d{8}$/.test(phone)||!(Number(price)>0)){alert("أكمل البيانات وأدخل رقم سعودي صحيح يبدأ بـ 05");return}
+ads.unshift({title,price,city,description,phone});
+localStorage.setItem(key,JSON.stringify(ads));["title","price","description","phone"].forEach(id=>document.getElementById(id).value="");
+render();location.hash="ads";alert("تم نشر إعلانك التجريبي على هذا الجهاز");
+}
+function whatsapp(i){let p=ads[i].phone;window.open("https://wa.me/966"+p.slice(1)+"?text="+encodeURIComponent("السلام عليكم، أتواصل بخصوص إعلان "+ads[i].title),"_blank")}
+function callSeller(i){location.href="tel:"+ads[i].phone}
+function openChat(i){active=i;document.getElementById("chatbox").style.display="block";document.getElementById("chatTitle").textContent="التفاوض على: "+ads[i].title;showMsgs()}
+function closeChat(){document.getElementById("chatbox").style.display="none"}
+function showMsgs(){let arr=JSON.parse(localStorage.getItem("chat_"+active)||"[]");document.getElementById("messages").innerHTML=arr.map(m=>'<div class="message">'+safe(m)+'</div>').join("")}
+function sendMsg(){let input=document.getElementById("msg"),m=input.value.trim();if(!m)return;let k="chat_"+active,arr=JSON.parse(localStorage.getItem(k)||"[]");arr.push(m);localStorage.setItem(k,JSON.stringify(arr));input.value="";showMsgs()}
+render();
+</script>
 </body>
 </html>
