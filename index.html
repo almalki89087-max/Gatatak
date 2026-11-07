@@ -47,8 +47,8 @@ footer{text-align:center;background:#101820;color:white;padding:25px}
 <main>
 <section class="card" id="searchArea">
 <h2>🔎 ابحث عن قطعتك</h2>
-<input id="search" placeholder="اسم القطعة" oninput="render()">
-<select id="searchBrand" onchange="updateModels('searchBrand','searchModel');render()"></select>
+<input id="search" placeholder="اسم القطعة أو السيارة" oninput="render()">
+<select id="searchBrand" onchange="updateModels('searchBrand','searchModel')"></select>
 <select id="searchModel" onchange="render()"></select>
 <select id="searchYear" onchange="render()"></select>
 <select id="searchRegion" onchange="render()"></select>
@@ -62,22 +62,33 @@ footer{text-align:center;background:#101820;color:white;padding:25px}
 <section class="card" id="sell">
 <h2>➕ أضف إعلانك مجانًا</h2>
 <input id="title" placeholder="اسم القطعة" maxlength="100">
+
+<label>ماركة السيارة</label>
 <select id="brand" onchange="updateModels('brand','model')"></select>
-<select id="model"></select>
+<input id="otherBrand" placeholder="اكتب اسم ماركة السيارة" maxlength="60" style="display:none">
+
+<label>موديل السيارة</label>
+<select id="model" onchange="toggleOtherModel()"></select>
+<input id="otherModel" placeholder="اكتب اسم موديل السيارة" maxlength="60" style="display:none">
+
 <select id="year"></select>
 <select id="region"></select>
+
 <select id="condition">
 <option value="">حالة القطعة</option>
 <option>جديدة</option>
 <option>مستعملة</option>
 <option>مجددة</option>
 </select>
+
 <input id="price" type="number" min="1" placeholder="السعر بالريال">
 <textarea id="description" placeholder="وصف القطعة"></textarea>
 <input id="phone" type="tel" maxlength="10" placeholder="رقم الجوال 05xxxxxxxx">
+
 <label><strong>📸 صور القطعة (صورة واحدة إلزامية، بحد أقصى 5)</strong></label>
 <input id="photos" type="file" accept="image/*" multiple required>
 <p class="muted">لن يتم نشر الإعلان بدون صورة للقطعة.</p>
+
 <button class="primary" onclick="addAd()">نشر الإعلان مجانًا</button>
 <p class="muted">نسخة تجريبية: الإعلانات محفوظة على هذا الجهاز فقط.</p>
 </section>
@@ -132,7 +143,7 @@ const cars={
 "هافال":["H6","H9","جوليون","دارجو"],
 "ام جي":["MG5","MG6","ZS","HS","RX5","RX8","GT"],
 "شيري":["اريزو 5","تيجو 4","تيجو 7","تيجو 8"],
-"بي واي دي":["سونج بلس","هان","اتّو 3","سيل","دولفين"],
+"بي واي دي":["سونج بلس","هان","اتو 3","سيل","دولفين"],
 "جيتور":["X70","X90","داشينج","T2"],
 "تانك":["300","500"],
 "تسلا":["Model 3","Model Y","Model S","Model X"],
@@ -147,25 +158,46 @@ const regions=[
 ];
 
 function fill(id,items,label){
-let el=document.getElementById(id);
+const el=document.getElementById(id);
 el.innerHTML="";
 el.add(new Option(label,""));
 items.forEach(x=>el.add(new Option(x,x)));
 }
 
 function updateModels(brandId,modelId){
-let brand=document.getElementById(brandId).value;
-fill(modelId,cars[brand]||[],"جميع الموديلات / اختر الموديل");
-if(brandId==="searchBrand")render();
+const brand=document.getElementById(brandId).value;
+const models=cars[brand]||[];
+fill(
+modelId,
+[...models,"أخرى"],
+brandId==="searchBrand"?"جميع الموديلات":"اختر الموديل"
+);
+if(brandId==="brand"){
+const other=document.getElementById("otherBrand");
+other.style.display=brand==="أخرى"?"block":"none";
+other.required=brand==="أخرى";
+if(brand!=="أخرى")other.value="";
+toggleOtherModel();
+}else{
+render();
+}
+}
+
+function toggleOtherModel(){
+const model=document.getElementById("model").value;
+const other=document.getElementById("otherModel");
+other.style.display=model==="أخرى"?"block":"none";
+other.required=model==="أخرى";
+if(model!=="أخرى")other.value="";
 }
 
 function setup(){
-let brands=Object.keys(cars).sort((a,b)=>a.localeCompare(b,"ar"));
-fill("brand",brands,"اختر ماركة السيارة");
-fill("searchBrand",brands,"جميع الماركات");
-fill("model",[],"اختر الموديل");
-fill("searchModel",[],"جميع الموديلات");
-let years=[];
+const brands=Object.keys(cars).sort((a,b)=>a.localeCompare(b,"ar"));
+fill("brand",[...brands,"أخرى"],"اختر ماركة السيارة");
+fill("searchBrand",[...brands,"أخرى"],"جميع الماركات");
+fill("model",["أخرى"],"اختر الموديل");
+fill("searchModel",["أخرى"],"جميع الموديلات");
+const years=[];
 for(let y=2027;y>=1980;y--)years.push(String(y));
 fill("year",years,"اختر سنة الصنع");
 fill("searchYear",years,"جميع السنوات");
@@ -176,43 +208,52 @@ render();
 
 const storageKey="gatatak_ads_v2";
 let ads=[];
-try{ads=JSON.parse(localStorage.getItem(storageKey)||"[]")}catch(e){ads=[]}
+try{
+const saved=JSON.parse(localStorage.getItem(storageKey)||"[]");
+ads=Array.isArray(saved)?saved:[];
+}catch(e){ads=[]}
 let activeAd=null;
 
 function escapeHTML(value){
-return String(value).replace(/[&<>"']/g,c=>({
+return String(value??"").replace(/[&<>"']/g,c=>({
 "&":"&amp;","<":"&lt;",">":"&gt;",
 '"':"&quot;","'":"&#39;"
 })[c]);
 }
 
 function render(){
-let q=document.getElementById("search").value.trim().toLowerCase();
-let brand=document.getElementById("searchBrand").value;
-let model=document.getElementById("searchModel").value;
-let year=document.getElementById("searchYear").value;
-let region=document.getElementById("searchRegion").value;
-let filtered=ads.filter(a=>
-(a.title+" "+a.description).toLowerCase().includes(q)&&
-(!brand||a.brand===brand)&&
-(!model||a.model===model)&&
+const q=document.getElementById("search").value.trim().toLowerCase();
+const brand=document.getElementById("searchBrand").value;
+const model=document.getElementById("searchModel").value;
+const year=document.getElementById("searchYear").value;
+const region=document.getElementById("searchRegion").value;
+
+const filtered=ads.filter(a=>
+(a.title+" "+a.description+" "+a.brand+" "+a.model).toLowerCase().includes(q)&&
+(!brand||(brand==="أخرى"?!Object.prototype.hasOwnProperty.call(cars,a.brand):a.brand===brand))&&
+(!model||(model==="أخرى"?!(cars[a.brand]||[]).includes(a.model):a.model===model))&&
 (!year||a.year===year)&&
 (!region||a.region===region)
 );
-let list=document.getElementById("adList");
+
+const list=document.getElementById("adList");
 list.innerHTML="";
 if(!filtered.length){
 list.innerHTML='<div class="card">لا توجد إعلانات مطابقة حاليًا.</div>';
 return;
 }
+
 filtered.forEach(a=>{
-let article=document.createElement("article");
+const article=document.createElement("article");
 article.className="card ad";
-let image=document.createElement("img");
-image.src=a.photos[0];
-image.alt="صورة القطعة";
-article.appendChild(image);
-let info=document.createElement("div");
+if(a.photos&&a.photos.length){
+const photo=document.createElement("img");
+photo.src=a.photos[0];
+photo.alt="صورة القطعة";
+article.appendChild(photo);
+}
+
+const info=document.createElement("div");
 info.innerHTML=
 "<h3>"+escapeHTML(a.title)+"</h3>"+
 '<p class="price">'+escapeHTML(a.price)+" ر.س</p>"+
@@ -220,14 +261,15 @@ info.innerHTML=
 "<p>📍 "+escapeHTML(a.region)+" | "+escapeHTML(a.condition)+"</p>"+
 "<p>"+escapeHTML(a.description)+"</p>";
 article.appendChild(info);
-let actions=document.createElement("div");
+
+const actions=document.createElement("div");
 actions.className="actions";
 [
 ["💬 تفاوض",()=>openChat(a)],
 ["واتساب",()=>whatsapp(a)],
 ["📞 اتصال",()=>{location.href="tel:"+a.phone}]
 ].forEach(([label,fn])=>{
-let b=document.createElement("button");
+const b=document.createElement("button");
 b.textContent=label;
 b.onclick=fn;
 actions.appendChild(b);
@@ -239,7 +281,7 @@ list.appendChild(article);
 
 function readPhoto(file){
 return new Promise((resolve,reject)=>{
-let reader=new FileReader();
+const reader=new FileReader();
 reader.onload=()=>resolve(reader.result);
 reader.onerror=reject;
 reader.readAsDataURL(file);
@@ -247,22 +289,29 @@ reader.readAsDataURL(file);
 }
 
 async function addAd(){
-let get=id=>document.getElementById(id).value.trim();
-let files=[...document.getElementById("photos").files];
-let title=get("title"),brand=get("brand"),model=get("model");
-let year=get("year"),region=get("region");
-let condition=get("condition"),price=get("price");
-let description=get("description"),phone=get("phone");
+const get=id=>document.getElementById(id).value.trim();
+const files=[...document.getElementById("photos").files];
+
+const title=get("title");
+const brandChoice=get("brand");
+const modelChoice=get("model");
+const brand=brandChoice==="أخرى"?get("otherBrand"):brandChoice;
+const model=modelChoice==="أخرى"?get("otherModel"):modelChoice;
+const year=get("year"),region=get("region");
+const condition=get("condition"),price=get("price");
+const description=get("description"),phone=get("phone");
 
 if(!title||!brand||!model||!year||!region||
 !condition||!description||!(Number(price)>0)){
-alert("فضلاً أكمل جميع بيانات الإعلان.");
+alert("فضلاً أكمل جميع بيانات الإعلان، بما فيها اسم السيارة والموديل.");
 return;
 }
+
 if(!/^05\d{8}$/.test(phone)){
 alert("أدخل رقم جوال سعودي صحيح يبدأ بـ 05.");
 return;
 }
+
 if(files.length<1){
 alert("📸 يجب إضافة صورة واحدة على الأقل للقطعة.");
 return;
@@ -279,19 +328,27 @@ if(files.some(f=>f.size>2*1024*1024)){
 alert("اختر صورًا حجم كل واحدة منها أقل من 2 ميجابايت.");
 return;
 }
+
 try{
-let photos=await Promise.all(files.map(readPhoto));
-let ad={
+const photos=await Promise.all(files.map(readPhoto));
+const ad={
 id:Date.now()+"-"+Math.random().toString(36).slice(2),
 title,brand,model,year,region,condition,
 price,description,phone,photos
 };
-let updated=[ad,...ads];
+const updated=[ad,...ads];
 localStorage.setItem(storageKey,JSON.stringify(updated));
 ads=updated;
-["title","price","description","phone","photos"].forEach(id=>{
+
+["title","price","description","phone","photos","otherBrand","otherModel"].forEach(id=>{
 document.getElementById(id).value="";
 });
+document.getElementById("brand").value="";
+updateModels("brand","model");
+document.getElementById("year").value="";
+document.getElementById("region").value="";
+document.getElementById("condition").value="";
+
 render();
 location.hash="ads";
 alert("تم حفظ الإعلان التجريبي على جهازك.");
@@ -301,8 +358,8 @@ alert("تعذر حفظ الإعلان. قد تكون الصور كبيرة أو 
 }
 
 function whatsapp(ad){
-let number="966"+ad.phone.slice(1);
-let text="السلام عليكم، أتواصل بخصوص إعلان "+ad.title+" في قطعتك";
+const number="966"+ad.phone.slice(1);
+const text="السلام عليكم، أتواصل بخصوص إعلان "+ad.title+" في قطعتك";
 window.open("https://wa.me/"+number+"?text="+encodeURIComponent(text),"_blank");
 }
 
@@ -326,8 +383,8 @@ messages.map(m=>'<div class="msg">'+escapeHTML(m)+'</div>').join("");
 }
 function sendMessage(){
 if(!activeAd)return;
-let input=document.getElementById("messageInput");
-let value=input.value.trim();
+const input=document.getElementById("messageInput");
+const value=input.value.trim();
 if(!value)return;
 let messages=[];
 try{messages=JSON.parse(localStorage.getItem(chatKey())||"[]")}catch(e){}
@@ -336,7 +393,9 @@ try{
 localStorage.setItem(chatKey(),JSON.stringify(messages));
 input.value="";
 showMessages();
-}catch(e){alert("تعذر حفظ الرسالة التجريبية.");}
+}catch(e){
+alert("تعذر حفظ الرسالة التجريبية.");
+}
 }
 setup();
 </script>
