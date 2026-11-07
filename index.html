@@ -1,75 +1,344 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>قطعتك | سوق قطع غيار السيارات</title>
+<title>قطعتك | Gatatak</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f1f5f6;color:#101820;font-family:Arial,sans-serif}
-header{background:#080d12;color:white;padding:22px 16px;text-align:center;border-bottom:5px solid #12c9c2}
-header h1{color:#23d7d0;font-size:34px;margin:0}header p{margin:10px 0}
-nav{display:flex;justify-content:space-around;background:#101820;padding:14px 5px;position:sticky;top:0;z-index:2}
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f6;color:#101820;font-family:Arial,sans-serif}
+header{background:#101820;color:white;text-align:center;padding:25px 12px}
+header h1{color:#16c8c0;font-size:36px;margin:0}
+header p{color:#d5e5e6}
+nav{background:#182630;padding:14px;display:flex;justify-content:space-around;position:sticky;top:0;z-index:2}
 nav a{color:white;text-decoration:none;font-size:14px}
-main{max-width:750px;margin:auto;padding:16px}
-.panel,.ad{background:white;padding:18px;border-radius:16px;margin-bottom:15px;box-shadow:0 3px 12px #00000012}
-h2{font-size:22px}input,select,textarea{width:100%;padding:14px;margin:7px 0;border:1px solid #ccd5d7;border-radius:10px;font:inherit}
-button,.btn{display:inline-block;background:#08aaa6;color:white;border:0;border-radius:10px;padding:13px 17px;font:inherit;cursor:pointer;text-decoration:none}
-.primary{width:100%;background:#08aaa6;font-weight:bold}
-.ad{border-right:5px solid #10c6be}.ad h3{margin:5px 0}.price{color:#008e88;font-size:21px;font-weight:bold}
-.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
-.actions button{flex:1;min-width:85px;font-size:13px;padding:11px 6px}
-.muted{color:#657278;font-size:14px}
-#chatbox{display:none;position:fixed;inset:10% 5%;background:white;z-index:5;padding:18px;border-radius:15px;box-shadow:0 0 0 100vmax #0009;overflow:auto}
-#messages{height:45%;overflow:auto;background:#f1f5f6;padding:12px;border-radius:10px}
-.message{background:#d9faf8;margin:8px 0;padding:10px;border-radius:10px}
-footer{text-align:center;background:#101820;color:white;padding:25px;margin-top:20px}
+main{max-width:850px;margin:auto;padding:15px}
+.card{background:white;border-radius:15px;padding:17px;margin-bottom:15px;box-shadow:0 3px 12px #0001}
+h2{font-size:21px}
+input,select,textarea{width:100%;padding:13px;border:1px solid #cbd5d8;border-radius:9px;margin:6px 0;font:inherit}
+button{border:0;background:#079e99;color:white;padding:12px;border-radius:9px;font:inherit;cursor:pointer}
+.primary{width:100%;background:#09aaa4;font-weight:bold}
+.ad{border-right:5px solid #16c8c0}
+.ad img{width:100%;height:190px;object-fit:cover;border-radius:10px}
+.price{font-size:22px;color:#008e88;font-weight:bold}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions button{flex:1;font-size:13px}
+.muted{color:#66777c;font-size:13px}
+#chat{display:none;position:fixed;inset:8% 5%;background:white;z-index:10;border-radius:15px;padding:20px;box-shadow:0 0 0 100vmax #0009;overflow:auto}
+#messages{height:180px;overflow:auto;background:#f1f5f6;padding:10px;margin:10px 0}
+.msg{background:#d7f7f5;padding:9px;margin:7px 0;border-radius:8px}
+footer{text-align:center;background:#101820;color:white;padding:25px}
 </style>
 </head>
 <body>
-<header><h1>🚗 قطعتك</h1><p>سوق بيع وشراء قطع غيار السيارات في السعودية</p></header>
-<nav><a href="#home">الرئيسية</a><a href="#ads">الإعلانات</a><a href="#sell">أضف إعلان</a></nav>
-<main id="home">
-<section class="panel"><h2>🔎 ابحث عن قطعتك</h2>
-<input id="search" placeholder="مثال: صدام كامري 2020" oninput="render()">
-<select id="region" onchange="render()"><option value="">جميع مناطق السعودية</option><option>الرياض</option><option>مكة المكرمة</option><option>المدينة المنورة</option><option>المنطقة الشرقية</option><option>القصيم</option><option>عسير</option><option>تبوك</option><option>حائل</option><option>جازان</option><option>نجران</option><option>الباحة</option><option>الجوف</option><option>الحدود الشمالية</option></select>
+
+<header>
+<h1>🚗 قطعتك</h1>
+<p>سوق بيع وشراء قطع غيار السيارات في السعودية</p>
+</header>
+
+<nav>
+<a href="#searchArea">بحث</a>
+<a href="#ads">الإعلانات</a>
+<a href="#sell">أضف إعلان</a>
+</nav>
+
+<main>
+<section class="card" id="searchArea">
+<h2>🔎 ابحث عن قطعتك</h2>
+<input id="search" placeholder="اسم القطعة" oninput="render()">
+<select id="searchBrand" onchange="updateModels('searchBrand','searchModel');render()"></select>
+<select id="searchModel" onchange="render()"></select>
+<select id="searchYear" onchange="render()"></select>
+<select id="searchRegion" onchange="render()"></select>
 </section>
-<section id="ads"><h2>🛞 إعلانات قطع الغيار</h2><div id="list"></div></section>
-<section id="sell" class="panel"><h2>➕ أضف إعلانك مجانًا</h2>
-<input id="title" placeholder="اسم القطعة والسيارة" maxlength="100">
+
+<section id="ads">
+<h2>🛞 أحدث الإعلانات</h2>
+<div id="adList"></div>
+</section>
+
+<section class="card" id="sell">
+<h2>➕ أضف إعلانك مجانًا</h2>
+<input id="title" placeholder="اسم القطعة" maxlength="100">
+<select id="brand" onchange="updateModels('brand','model')"></select>
+<select id="model"></select>
+<select id="year"></select>
+<select id="region"></select>
+<select id="condition">
+<option value="">حالة القطعة</option>
+<option>جديدة</option>
+<option>مستعملة</option>
+<option>مجددة</option>
+</select>
 <input id="price" type="number" min="1" placeholder="السعر بالريال">
-<select id="city"><option value="">اختر المنطقة</option><option>الرياض</option><option>مكة المكرمة</option><option>المدينة المنورة</option><option>المنطقة الشرقية</option><option>القصيم</option><option>عسير</option><option>تبوك</option><option>حائل</option><option>جازان</option><option>نجران</option><option>الباحة</option><option>الجوف</option><option>الحدود الشمالية</option></select>
-<textarea id="description" placeholder="وصف القطعة وحالتها"></textarea>
-<input id="phone" type="tel" placeholder="رقم الجوال السعودي 05xxxxxxxx" maxlength="10">
+<textarea id="description" placeholder="وصف القطعة"></textarea>
+<input id="phone" type="tel" maxlength="10" placeholder="رقم الجوال 05xxxxxxxx">
+<label><strong>📸 صور القطعة (صورة واحدة إلزامية، بحد أقصى 5)</strong></label>
+<input id="photos" type="file" accept="image/*" multiple required>
+<p class="muted">لن يتم نشر الإعلان بدون صورة للقطعة.</p>
 <button class="primary" onclick="addAd()">نشر الإعلان مجانًا</button>
-<p class="muted">نسخة تجريبية: الإعلانات تحفظ على هذا الجهاز فقط.</p>
+<p class="muted">نسخة تجريبية: الإعلانات محفوظة على هذا الجهاز فقط.</p>
 </section>
 </main>
-<div id="chatbox"><button onclick="closeChat()">إغلاق ✕</button><h2 id="chatTitle">محادثة</h2><p class="muted">محادثة تجريبية محفوظة على هذا الجهاز فقط.</p><div id="messages"></div><input id="msg" placeholder="اكتب عرضك أو رسالتك"><button class="primary" onclick="sendMsg()">إرسال</button></div>
-<footer>قطعتك © 2026 — إعلانات مجانية في البداية</footer>
+
+<div id="chat">
+<button onclick="closeChat()">إغلاق ✕</button>
+<h2 id="chatTitle">التفاوض</h2>
+<p class="muted">محادثة تجريبية على نفس الجهاز فقط.</p>
+<div id="messages"></div>
+<input id="messageInput" placeholder="اكتب عرض السعر أو رسالتك">
+<button class="primary" onclick="sendMessage()">إرسال</button>
+</div>
+
+<footer>قطعتك © 2026 | Gatatak</footer>
+
 <script>
-const key="qatatak_ads_v1";
-let ads=JSON.parse(localStorage.getItem(key)||"[]"),active=0;
-function safe(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function render(){
-const q=document.getElementById("search").value.trim().toLowerCase(),r=document.getElementById("region").value;
-const found=ads.map((a,i)=>({...a,id:i})).filter(a=>(a.title+" "+a.description).toLowerCase().includes(q)&&(!r||a.city===r));
-document.getElementById("list").innerHTML=found.length?found.map(a=>'<article class="ad"><h3>'+safe(a.title)+'</h3><p class="price">'+safe(a.price)+' ريال</p><p>📍 '+safe(a.city)+'</p><p>'+safe(a.description)+'</p><div class="actions"><button onclick="openChat('+a.id+')">💬 تفاوض</button><button onclick="whatsapp('+a.id+')">واتساب</button><button onclick="callSeller('+a.id+')">📞 اتصال</button></div></article>').join(""):'<div class="panel">لا توجد إعلانات حاليًا. كن أول من يضيف قطعة!</div>';
+const cars={
+"تويوتا":["كامري","كورولا","يارس","هايلكس","لاندكروزر","برادو","راف فور","افالون","فورتشنر","انوفا","شاص","ربع","سوبرا","كراون","سيكويا"],
+"هيونداي":["اكسنت","النترا","سوناتا","ازيرا","توسان","سانتافي","كريتا","باليسيد","كونا","ستاريا"],
+"نيسان":["باترول","التيما","صني","ماكسيما","اكستيرا","نافارا","كيكس","باثفايندر","ارمادا","زد"],
+"كيا":["ريو","سيراتو","K3","K5","K8","سبورتاج","سورينتو","سيلتوس","كارنفال","تيلورايد","بيكانتو"],
+"فورد":["تورس","اكسبلورر","اكسبدشن","موستانج","رابتر","F150","ايدج","رينجر","برونكو"],
+"شفروليه":["تاهو","سوبربان","سلفرادو","ماليبو","كابتيفا","ترافيرس","كامارو","بليزر"],
+"جي إم سي":["يوكن","سييرا","اكاديا","تيرين","كانون","سافانا"],
+"لكزس":["ES","IS","LS","GS","RX","LX","GX","NX","UX","RC"],
+"مرسيدس":["A-Class","C-Class","E-Class","S-Class","CLA","GLA","GLC","GLE","GLS","G-Class"],
+"بي إم دبليو":["الفئة الأولى","الفئة الثالثة","الفئة الخامسة","الفئة السابعة","X1","X3","X5","X6","X7"],
+"هوندا":["اكورد","سيفيك","سي آر في","بايلوت","سيتي","اتش آر في","اوديسي"],
+"مازدا":["مازدا 3","مازدا 6","CX-3","CX-5","CX-9","CX-30","CX-60"],
+"ميتسوبيشي":["لانسر","باجيرو","مونتيرو سبورت","اوتلاندر","اتراج","L200","اكليبس كروس"],
+"سوزوكي":["ديزاير","سويفت","فيتارا","جيمني","بالينو","سياز"],
+"ايسوزو":["ديماكس","MUX","NPR"],
+"دودج":["تشارجر","تشالنجر","دورانجو","رام","نيون"],
+"جيب":["رانجلر","جراند شيروكي","شيروكي","كومباس","جلاديتور"],
+"رام":["1500","2500","3500"],
+"كرايسلر":["300","باسيفيكا"],
+"فولكس واجن":["جيتا","باسات","جولف","تيجوان","طوارق","تيرامونت"],
+"اودي":["A3","A4","A6","A8","Q3","Q5","Q7","Q8"],
+"بورش":["كايين","ماكان","باناميرا","911","تايكان"],
+"رينو":["داستر","كوليوس","ميجان","سيمبول"],
+"بيجو":["208","301","3008","5008","508"],
+"سيتروين":["C3","C4","C5"],
+"فولفو":["XC40","XC60","XC90","S60","S90"],
+"لاند روفر":["ديفندر","ديسكفري","رينج روفر","ايفوك","سبورت"],
+"جاكوار":["XF","XE","F-Pace","E-Pace"],
+"انفينيتي":["Q50","QX50","QX60","QX80"],
+"كاديلاك":["اسكاليد","CT5","XT4","XT5","XT6"],
+"لينكون":["نافيجيتور","افياتور","كورسير","نوتيلوس"],
+"شانجان":["ايدو","السفن","CS35","CS55","CS75","UNI-K","UNI-T"],
+"جيلي":["امجراند","كولراي","مونجارو","ازكارا","توغيلا"],
+"هافال":["H6","H9","جوليون","دارجو"],
+"ام جي":["MG5","MG6","ZS","HS","RX5","RX8","GT"],
+"شيري":["اريزو 5","تيجو 4","تيجو 7","تيجو 8"],
+"بي واي دي":["سونج بلس","هان","اتّو 3","سيل","دولفين"],
+"جيتور":["X70","X90","داشينج","T2"],
+"تانك":["300","500"],
+"تسلا":["Model 3","Model Y","Model S","Model X"],
+"سوبارو":["امبريزا","فورستر","اوتباك","XV","WRX"]
+};
+
+const regions=[
+"الرياض","مكة المكرمة","المدينة المنورة",
+"المنطقة الشرقية","القصيم","عسير","تبوك",
+"حائل","جازان","نجران","الباحة",
+"الجوف","الحدود الشمالية"
+];
+
+function fill(id,items,label){
+let el=document.getElementById(id);
+el.innerHTML="";
+el.add(new Option(label,""));
+items.forEach(x=>el.add(new Option(x,x)));
 }
-function addAd(){
-const get=id=>document.getElementById(id).value.trim();
-let title=get("title"),price=get("price"),city=get("city"),description=get("description"),phone=get("phone");
-if(!title||!city||!description||!/^05\d{8}$/.test(phone)||!(Number(price)>0)){alert("أكمل البيانات وأدخل رقم سعودي صحيح يبدأ بـ 05");return}
-ads.unshift({title,price,city,description,phone});
-localStorage.setItem(key,JSON.stringify(ads));["title","price","description","phone"].forEach(id=>document.getElementById(id).value="");
-render();location.hash="ads";alert("تم نشر إعلانك التجريبي على هذا الجهاز");
+
+function updateModels(brandId,modelId){
+let brand=document.getElementById(brandId).value;
+fill(modelId,cars[brand]||[],"جميع الموديلات / اختر الموديل");
+if(brandId==="searchBrand")render();
 }
-function whatsapp(i){let p=ads[i].phone;window.open("https://wa.me/966"+p.slice(1)+"?text="+encodeURIComponent("السلام عليكم، أتواصل بخصوص إعلان "+ads[i].title),"_blank")}
-function callSeller(i){location.href="tel:"+ads[i].phone}
-function openChat(i){active=i;document.getElementById("chatbox").style.display="block";document.getElementById("chatTitle").textContent="التفاوض على: "+ads[i].title;showMsgs()}
-function closeChat(){document.getElementById("chatbox").style.display="none"}
-function showMsgs(){let arr=JSON.parse(localStorage.getItem("chat_"+active)||"[]");document.getElementById("messages").innerHTML=arr.map(m=>'<div class="message">'+safe(m)+'</div>').join("")}
-function sendMsg(){let input=document.getElementById("msg"),m=input.value.trim();if(!m)return;let k="chat_"+active,arr=JSON.parse(localStorage.getItem(k)||"[]");arr.push(m);localStorage.setItem(k,JSON.stringify(arr));input.value="";showMsgs()}
+
+function setup(){
+let brands=Object.keys(cars).sort((a,b)=>a.localeCompare(b,"ar"));
+fill("brand",brands,"اختر ماركة السيارة");
+fill("searchBrand",brands,"جميع الماركات");
+fill("model",[],"اختر الموديل");
+fill("searchModel",[],"جميع الموديلات");
+let years=[];
+for(let y=2027;y>=1980;y--)years.push(String(y));
+fill("year",years,"اختر سنة الصنع");
+fill("searchYear",years,"جميع السنوات");
+fill("region",regions,"اختر المنطقة");
+fill("searchRegion",regions,"جميع مناطق السعودية");
 render();
+}
+
+const storageKey="gatatak_ads_v2";
+let ads=[];
+try{ads=JSON.parse(localStorage.getItem(storageKey)||"[]")}catch(e){ads=[]}
+let activeAd=null;
+
+function escapeHTML(value){
+return String(value).replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",
+'"':"&quot;","'":"&#39;"
+})[c]);
+}
+
+function render(){
+let q=document.getElementById("search").value.trim().toLowerCase();
+let brand=document.getElementById("searchBrand").value;
+let model=document.getElementById("searchModel").value;
+let year=document.getElementById("searchYear").value;
+let region=document.getElementById("searchRegion").value;
+let filtered=ads.filter(a=>
+(a.title+" "+a.description).toLowerCase().includes(q)&&
+(!brand||a.brand===brand)&&
+(!model||a.model===model)&&
+(!year||a.year===year)&&
+(!region||a.region===region)
+);
+let list=document.getElementById("adList");
+list.innerHTML="";
+if(!filtered.length){
+list.innerHTML='<div class="card">لا توجد إعلانات مطابقة حاليًا.</div>';
+return;
+}
+filtered.forEach(a=>{
+let article=document.createElement("article");
+article.className="card ad";
+let image=document.createElement("img");
+image.src=a.photos[0];
+image.alt="صورة القطعة";
+article.appendChild(image);
+let info=document.createElement("div");
+info.innerHTML=
+"<h3>"+escapeHTML(a.title)+"</h3>"+
+'<p class="price">'+escapeHTML(a.price)+" ر.س</p>"+
+"<p>"+escapeHTML(a.brand)+" - "+escapeHTML(a.model)+" - "+escapeHTML(a.year)+"</p>"+
+"<p>📍 "+escapeHTML(a.region)+" | "+escapeHTML(a.condition)+"</p>"+
+"<p>"+escapeHTML(a.description)+"</p>";
+article.appendChild(info);
+let actions=document.createElement("div");
+actions.className="actions";
+[
+["💬 تفاوض",()=>openChat(a)],
+["واتساب",()=>whatsapp(a)],
+["📞 اتصال",()=>{location.href="tel:"+a.phone}]
+].forEach(([label,fn])=>{
+let b=document.createElement("button");
+b.textContent=label;
+b.onclick=fn;
+actions.appendChild(b);
+});
+article.appendChild(actions);
+list.appendChild(article);
+});
+}
+
+function readPhoto(file){
+return new Promise((resolve,reject)=>{
+let reader=new FileReader();
+reader.onload=()=>resolve(reader.result);
+reader.onerror=reject;
+reader.readAsDataURL(file);
+});
+}
+
+async function addAd(){
+let get=id=>document.getElementById(id).value.trim();
+let files=[...document.getElementById("photos").files];
+let title=get("title"),brand=get("brand"),model=get("model");
+let year=get("year"),region=get("region");
+let condition=get("condition"),price=get("price");
+let description=get("description"),phone=get("phone");
+
+if(!title||!brand||!model||!year||!region||
+!condition||!description||!(Number(price)>0)){
+alert("فضلاً أكمل جميع بيانات الإعلان.");
+return;
+}
+if(!/^05\d{8}$/.test(phone)){
+alert("أدخل رقم جوال سعودي صحيح يبدأ بـ 05.");
+return;
+}
+if(files.length<1){
+alert("📸 يجب إضافة صورة واحدة على الأقل للقطعة.");
+return;
+}
+if(files.length>5){
+alert("الحد الأقصى خمس صور.");
+return;
+}
+if(files.some(f=>!f.type.startsWith("image/"))){
+alert("الملفات المسموحة صور فقط.");
+return;
+}
+if(files.some(f=>f.size>2*1024*1024)){
+alert("اختر صورًا حجم كل واحدة منها أقل من 2 ميجابايت.");
+return;
+}
+try{
+let photos=await Promise.all(files.map(readPhoto));
+let ad={
+id:Date.now()+"-"+Math.random().toString(36).slice(2),
+title,brand,model,year,region,condition,
+price,description,phone,photos
+};
+let updated=[ad,...ads];
+localStorage.setItem(storageKey,JSON.stringify(updated));
+ads=updated;
+["title","price","description","phone","photos"].forEach(id=>{
+document.getElementById(id).value="";
+});
+render();
+location.hash="ads";
+alert("تم حفظ الإعلان التجريبي على جهازك.");
+}catch(e){
+alert("تعذر حفظ الإعلان. قد تكون الصور كبيرة أو مساحة التخزين ممتلئة.");
+}
+}
+
+function whatsapp(ad){
+let number="966"+ad.phone.slice(1);
+let text="السلام عليكم، أتواصل بخصوص إعلان "+ad.title+" في قطعتك";
+window.open("https://wa.me/"+number+"?text="+encodeURIComponent(text),"_blank");
+}
+
+function openChat(ad){
+activeAd=ad;
+document.getElementById("chat").style.display="block";
+document.getElementById("chatTitle").textContent="التفاوض على "+ad.title;
+showMessages();
+}
+function closeChat(){
+document.getElementById("chat").style.display="none";
+}
+function chatKey(){
+return "gatatak_chat_"+activeAd.id;
+}
+function showMessages(){
+let messages=[];
+try{messages=JSON.parse(localStorage.getItem(chatKey())||"[]")}catch(e){}
+document.getElementById("messages").innerHTML=
+messages.map(m=>'<div class="msg">'+escapeHTML(m)+'</div>').join("");
+}
+function sendMessage(){
+if(!activeAd)return;
+let input=document.getElementById("messageInput");
+let value=input.value.trim();
+if(!value)return;
+let messages=[];
+try{messages=JSON.parse(localStorage.getItem(chatKey())||"[]")}catch(e){}
+messages.push(value);
+try{
+localStorage.setItem(chatKey(),JSON.stringify(messages));
+input.value="";
+showMessages();
+}catch(e){alert("تعذر حفظ الرسالة التجريبية.");}
+}
+setup();
 </script>
 </body>
 </html>
