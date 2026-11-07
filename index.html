@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>قطعتك | قطع غيار السيارات</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#17212b}header{background:#102c43;color:white;padding:25px;text-align:center}h1{margin:0 0 10px}.container{padding:20px;max-width:650px;margin:auto}input,button{box-sizing:border-box;width:100%;padding:15px;margin:8px 0;border-radius:10px;font-size:16px}input{border:1px solid #ccc}button{background:#ed8b2c;color:white;border:0;cursor:pointer}.card{background:white;padding:20px;border-radius:15px;margin:15px 0;box-shadow:0 2px 8px #0001}</style>
+</style> </head>
+<body>
+<header><h1>🚗 قطعتك</h1><p>سوق قطع غيار السيارات</p></header>
+<main class="container"><h2>ابحث عن قطعتك</h2><input id="search" placeholder="مثال: صدام كامري 2020"><button onclick="searchParts()">بحث عن قطعة</button><p id="result"></p><div class="card"><h3>🔧 قطع غيار</h3><p>اعثر على القطعة المناسبة لسيارتك.</p></div><div class="card"><h3>🏪 محلات قطع الغيار</h3><p>قريبًا: عرض المحلات والقطع المتوفرة.</p></div></main>
+<script>function searchParts(){let q=document.getElementById("search").value.trim();document.getElementById("result").textContent=q?"بحثت عن: "+q+" — سيتم إضافة نتائج القطع لاحقًا.":"اكتب اسم القطعة أولًا";}</script>
+</body>
+</html>
